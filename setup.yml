@@ -1,0 +1,139 @@
+---
+- name: Hello Ansible - quick start https://www.raspberrypi.org/forums/viewtopic.php?t=152490&p=999528
+  hosts: rpi
+  become_user: root
+  become: yes
+
+  tasks:    
+    - name: To disable hostapd
+      command: update-rc.d -f hostapd remove
+    - name: To disable dnsmasq 
+      command: update-rc.d -f dnsmasq remove
+
+    - name: Set hostname     
+      command: echo "mediabox" > /etc/hostname
+    
+    - name: Update apt-get cache
+      apt: >
+        update_cache=yes
+        cache_valid_time=360   
+    - name: Update all packages to the latest version
+      apt: > 
+        upgrade=yes
+
+    - name: Update repositories cache and install "php5-common" package
+      apt: 
+        name: php5-common 
+    - name: Update repositories cache and install "php5-cgi" package
+      apt:
+        name: php5-cgi
+    - name: Update repositories cache and install "php5" package
+      apt:
+        name: php5
+    - name: Update repositories cache and install "lighttpd" package
+      apt:
+        name: lighttpd
+    - name: Update repositories cache and install "hostapd" package
+      apt:
+        name: hostapd
+    - name: Update repositories cache and install "dnsmasq" package
+      apt:
+        name: dnsmasq
+    - name: Update repositories cache and install "minidlna" package
+      apt:
+        name: minidlna
+    - name: Update repositories cache and install "samba" package
+      apt:
+        name: samba
+    - name: Update repositories cache and install "samba-common-bin" package
+      apt:
+        name: samba-common-bin
+    - name: Update repositories cache and install "usbmount" package
+      apt:
+        name: usbmount
+
+    - name: Setup Lighttpd /var/www
+      file:
+        path: /var/www
+        owner: www-data
+        group: www-data
+        mode: 0755
+
+    - name: Setup Lighttpd users
+      user:
+        name: pi
+        groups: www-data
+        append: yes
+    
+    - name: tell Lighttpd to use PHP
+      command: lighty-enable-mod fastcgi-php userdir
+      ignore_errors: True
+
+    - name: Start Lighttpd
+      service:
+        name: lighttpd 
+        state: started
+        enabled: yes
+
+    - name: reload Lighttpd
+      service:
+        name: lighttpd
+        state: reloaded
+
+    - name: permissions on /media
+      file:
+        path: /media
+        mode: 0755
+    - name: Clean artifact path
+      file:
+        path: /var/www
+        name: index.lighttpd.html
+        state: absent   
+
+    - name: create index.html
+      lineinfile:
+        create: yes
+        state: present
+        dest: /var/www/index.html
+        line: '<html><meta http-equiv="refresh" content="0; url=media/" /> </html>'
+
+    - name: link /media to the web interface 
+      file:
+        src: /media
+        dest: /var/www/media
+        state: link
+
+    - name: Copy lighttpd.conf 
+      copy:
+        src: ./lighttpd.conf 
+        dest: /etc/lighttpd/lighttpd.conf 
+
+    - name: unarchive DirectoryLister 
+      unarchive:
+        src: DirectoryLister.tar.gz
+        dest: /media
+
+    - name: Copy files from foo to bar
+      copy: 
+        remote_src: true 
+        src: /media/resources/default.config.php
+        dest: /media/resources/config.php
+   
+    - name: Samba
+      lineinfile:
+        dest: /etc/samba/smb.conf
+        regexp: '^[Media]'
+        line: '[Media]\ncomment=My media\npath = /media\nbrowsable = yes\nguest ok = yes\nread only = yes\n'
+
+    - name: reload Samba
+      service:
+        name: smbd 
+        state: started
+
+    - name: Config minidlna
+      lineinfile:
+        dest: /etc/minidlna.conf
+        regexp: '^media_dir='
+        line: 'media_dir=/media'
+        state: present
+
