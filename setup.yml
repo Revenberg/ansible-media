@@ -69,24 +69,25 @@
       command: lighty-enable-mod fastcgi-php userdir
       ignore_errors: True
 
-    - name: Start Lighttpd
+    - name: Stop Lighttpd
       service:
         name: lighttpd 
-        state: started
-        enabled: yes
+        state: stopped
 
-    - name: reload Lighttpd
+    - name: Start Lighttpd
       service:
         name: lighttpd
-        state: reloaded
+        state: started
+        enabled: yes
 
     - name: permissions on /media
       file:
         path: /media
         mode: 0755
+
     - name: Clean artifact path
       file:
-        path: /var/www
+        path: /var/www/html
         name: index.lighttpd.html
         state: absent   
 
@@ -94,7 +95,7 @@
       lineinfile:
         create: yes
         state: present
-        dest: /var/www/index.html
+        dest: /var/www/html/index.html
         line: '<html><meta http-equiv="refresh" content="0; url=media/" /> </html>'
 
     - name: link /media to the web interface 
