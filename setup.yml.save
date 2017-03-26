@@ -1,7 +1,7 @@
 ---
 - name: Hello Ansible - quick start https://www.raspberrypi.org/forums/viewtopic.php?t=152490&p=999528
   hosts: rpi
-  become_user: root
+  become_user: pi
   become: yes
 
   tasks:    
@@ -13,26 +13,6 @@
     - name: Set hostname     
       command: echo "mediabox" > /etc/hostname
     
-    - name: Update repro 1
-      lineinfile:
-        create: yes
-        state: present
-        dest: /etc/apt/sources.list
-        line: 'deb http://repozytorium.mati75.eu/raspbian jessie-backports main contrib non-free'
-
-    - name: Update repro 2
-      lineinfile:
-        create: yes
-        state: present
-        dest: /etc/apt/sources.list
-        line: '#deb-src http://repozytorium.mati75.eu/raspbian jessie-backports main contrib non-free'
-
-    - name: Update gpg pgpkeys.mit.edu1
-      command: "gpg --keyserver pgpkeys.mit.edu --recv-key CCD91D6111A06851"
-
-    - name: Update gpg pgpkeys.mit.edu2
-      command: "gpg --armor --export CCD91D6111A06851 | sudo apt-key add -"
-
     - name: Update apt-get cache
       apt: >
         update_cache=yes
@@ -58,7 +38,7 @@
         name: hostapd
     - name: Update repositories cache and install "dnsmasq" package
       apt:
-        name: dnsmasq
+      name: dnsmasq
     - name: Update repositories cache and install "ntfs-3g" package
       apt:
         name: ntfs-3g
@@ -142,8 +122,6 @@
         remote_src: true 
         src: /media/resources/default.config.php
         dest: /media/resources/config.php
-        become_user: pi
-        become: yes
    
     - name: Samba
       lineinfile:
