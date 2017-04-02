@@ -142,8 +142,8 @@
         remote_src: true 
         src: /media/resources/default.config.php
         dest: /media/resources/config.php
-        become_user: pi
-        become: yes
+      become_user: pi
+      become: yes
    
     - name: Samba
       lineinfile:
