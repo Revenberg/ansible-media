@@ -1,17 +1,23 @@
 ---
 - name: Hello Ansible - quick start https://www.raspberrypi.org/forums/viewtopic.php?t=152490&p=999528
   hosts: rpi
-  become_user: root
+  become_user: pi
   become: yes
 
   tasks:    
     - name: To disable hostapd
       command: update-rc.d -f hostapd remove
+      become_user: root
+      become: yes
     - name: To disable dnsmasq 
       command: update-rc.d -f dnsmasq remove
+      become_user: root
+      become: yes
 
     - name: Set hostname     
       command: echo "mediabox" > /etc/hostname
+      become_user: root
+      become: yes
     
     - name: Update repro 1
       lineinfile:
@@ -19,6 +25,8 @@
         state: present
         dest: /etc/apt/sources.list
         line: 'deb http://repozytorium.mati75.eu/raspbian jessie-backports main contrib non-free'
+      become_user: root
+      become: yes
 
     - name: Update repro 2
       lineinfile:
@@ -37,43 +45,70 @@
       apt: >
         update_cache=yes
         cache_valid_time=360   
+      become_user: root
+      become: yes
+
     - name: Update all packages to the latest version
       apt: > 
         upgrade=yes
+      become_user: root
+      become: yes
 
     - name: Update repositories cache and install "php5-common" package
       apt: 
         name: php5-common 
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "php5-cgi" package
       apt:
         name: php5-cgi
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "php5" package
       apt:
         name: php5
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "lighttpd" package
       apt:
         name: lighttpd
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "hostapd" package
       apt:
         name: hostapd
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "dnsmasq" package
       apt:
         name: dnsmasq
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "ntfs-3g" package
       apt:
         name: ntfs-3g
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "minidlna" package
       apt:
         name: minidlna
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "samba" package
       apt:
         name: samba
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "samba-common-bin" package
       apt:
         name: samba-common-bin
+      become_user: root
+      become: yes
     - name: Update repositories cache and install "usbmount" package
       apt:
         name: usbmount
+      become_user: root
+      become: yes
 
     - name: Setup Lighttpd /var/www
       file:
@@ -81,38 +116,52 @@
         owner: www-data
         group: www-data
         mode: 0755
+      become_user: root
+      become: yes
 
     - name: Setup Lighttpd users
       user:
         name: pi
         groups: www-data
         append: yes
+      become_user: root
+      become: yes
     
     - name: tell Lighttpd to use PHP
       command: lighty-enable-mod fastcgi-php userdir
       ignore_errors: True
+      become_user: root
+      become: yes
 
     - name: Stop Lighttpd
       service:
         name: lighttpd 
         state: stopped
+      become_user: root
+      become: yes
 
     - name: Start Lighttpd
       service:
         name: lighttpd
         state: started
         enabled: yes
+      become_user: root
+      become: yes
 
     - name: permissions on /media
       file:
         path: /media
         mode: 0755
+      become_user: root
+      become: yes
 
     - name: Clean artifact path
       file:
         path: /var/www/html
         name: index.lighttpd.html
         state: absent   
+      become_user: root
+      become: yes
 
     - name: create index.html
       lineinfile:
@@ -120,41 +169,51 @@
         state: present
         dest: /var/www/html/index.html
         line: '<html><meta http-equiv="refresh" content="0; url=media/" /> </html>'
+      become_user: root
+      become: yes
 
     - name: link /media to the web interface 
       file:
         src: /media
         dest: /var/www/media
         state: link
+      become_user: root
+      become: yes
 
     - name: Copy lighttpd.conf 
       copy:
         src: ./lighttpd.conf 
         dest: /etc/lighttpd/lighttpd.conf 
+      become_user: root
+      become: yes
 
     - name: unarchive DirectoryLister 
       unarchive:
         src: DirectoryLister.tar.gz
         dest: /media
+      become_user: root
+      become: yes
 
-    - name: Copy files from foo to bar
+    - name: Copy files from config.php
       copy: 
         remote_src: true 
         src: /media/resources/default.config.php
         dest: /media/resources/config.php
-      become_user: pi
-      become: yes
-   
+
     - name: Samba
       lineinfile:
         dest: /etc/samba/smb.conf
         regexp: '^[Media]'
         line: '[Media]\ncomment=My media\npath = /media\nbrowsable = yes\nguest ok = yes\nread only = yes\n'
+      become_user: root
+      become: yes
 
     - name: reload Samba
       service:
         name: smbd 
         state: started
+      become_user: root
+      become: yes
 
     - name: Config minidlna
       lineinfile:
@@ -162,4 +221,5 @@
         regexp: '^media_dir='
         line: 'media_dir=/media'
         state: present
-
+      become_user: root
+      become: yes
