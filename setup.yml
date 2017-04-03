@@ -1,5 +1,5 @@
 ---
-- name: Hello Ansible - quick start https://www.raspberrypi.org/forums/viewtopic.php?t=152490&p=999528
+- name: ansible-media - quick start https://www.raspberrypi.org/forums/viewtopic.php?t=152490&p=999528
   hosts: rpi
   become_user: pi
   become: yes
