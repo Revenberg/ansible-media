@@ -13,12 +13,7 @@
       command: update-rc.d -f dnsmasq remove
       become_user: root
       become: yes
-
-    - name: Set hostname     
-      command: echo "mediabox" > /etc/hostname
-      become_user: root
-      become: yes
-    
+   
     - name: Update repro 1
       lineinfile:
         create: yes
