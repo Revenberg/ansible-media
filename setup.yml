@@ -148,7 +148,9 @@
     - name: permissions on /media
       file:
         path: /media
-        mode: 0755
+        mode: 0777
+        owner: pi
+        group: pi
       become_user: root
       become: yes
 
@@ -174,6 +176,8 @@
         src: /media
         dest: /var/www/media
         state: link
+        owner: pi
+        group: pi
       become_user: root
       become: yes
 
@@ -212,7 +216,7 @@
       become_user: root
       become: yes
 
-    - name: Config minidlna
+    - name: Config minidlna media_dir=/media
       lineinfile:
         dest: /etc/minidlna.conf
         regexp: '^media_dir='
@@ -220,3 +224,72 @@
         state: present
       become_user: root
       become: yes
+    - name: Config minidlna media_dir=/media/usb0/music
+      lineinfile:
+        dest: /etc/minidlna.conf
+        insertafter: 'media_dir=.*$'
+        line: 'media_dir=A,/media/usb0/music'
+        state: present
+      become_user: root
+      become: yes
+    - name: Config minidlna media_dir=/media/usb0/video
+      lineinfile:
+        dest: /etc/minidlna.conf
+        insertafter: 'media_dir=.*$'
+        line: 'media_dir=V,/media/usb0/video'
+        state: present
+      become_user: root
+      become: yes
+    - name: Config minidlna media_dir=/media/usb1/music
+      lineinfile:
+        dest: /etc/minidlna.conf
+        insertafter: 'media_dir=.*$'
+        line: 'media_dir=A,/media/usb1/music'
+        state: present
+      become_user: root
+      become: yes
+    - name: Config minidlna media_dir=/media/usb1/video
+      lineinfile:
+        dest: /etc/minidlna.conf
+        insertafter: 'media_dir=.*$'
+        line: 'media_dir=V,/media/usb1/video'
+        state: present
+      become_user: root
+      become: yes
+
+    - name: Config minidlna friendly_name=Mediabox
+      lineinfile:
+        dest: /etc/minidlna.conf
+        regexp: '^friendly_name='
+        line: 'friendly_name=Mediabox'
+        state: present
+      become_user: root
+      become: yes
+    - name: Config minidlna inotify=yes
+      lineinfile:
+        dest: /etc/minidlna.conf
+        regexp: '^inotify='
+        line: 'inotify=yes'
+        state: present
+      become_user: root
+      become: yes
+    - name: Config minidlna notify_interval=300
+      lineinfile:
+        dest: /etc/minidlna.conf
+        regexp: '^notify_interval='
+        line: 'notify_interval=300'
+        state: present
+      become_user: root
+      become: yes
+
+    - name: minidlna restart
+      service:
+        name: minidlna 
+        state: restarted
+      become_user: root
+      become: yes
+    - name: minidlna reload
+      command: service minidlna force-reload
+      become_user: root
+      become: yes
+
