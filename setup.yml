@@ -293,3 +293,8 @@
       become_user: root
       become: yes
 
+    - name: Copy default_footer.php
+      copy:
+        src: ./default_footer.php
+        dest: /media/resources/themes/bootstrap/default_footer.php
+
