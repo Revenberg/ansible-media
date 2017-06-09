@@ -201,14 +201,23 @@
         src: /media/resources/default.config.php
         dest: /media/resources/config.php
 
-    - name: Samba
+    - name: Samba 1
       lineinfile:
-        dest: /etc/samba/smb.conf
-        regexp: '^[Media]'
-        line: '[Media]\ncomment=My media\npath = /media\nbrowsable = yes\nguest ok = yes\nread only = yes\n'
+        line: 'wins support = yes'
       become_user: root
       become: yes
-
+      
+   - name: Ansible blockinfile insertafter and insertbefore
+     blockinfile:
+       dest: /home/mdtutorials2/block_output.txt
+       block: |
+         [Media]
+         comment=My media
+         path = /media
+         browsable = yes
+         guest ok = yes
+         read only = yes              
+      
     - name: reload Samba
       service:
         name: smbd 
