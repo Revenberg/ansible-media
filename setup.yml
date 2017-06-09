@@ -222,7 +222,7 @@
           public = yes
           create mask = 0644
           directory mask = 0755
-          force user = shareuser
+          force user = shareuser 
       become_user: root
       become: yes
     - name: reload Samba
