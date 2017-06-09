@@ -207,16 +207,16 @@
       become_user: root
       become: yes
       
-   - name: Ansible blockinfile insertafter and insertbefore
-     blockinfile:
-       dest: /home/mdtutorials2/block_output.txt
-       block: |
-         [Media]
-         comment=My media
-         path = /media
-         browsable = yes
-         guest ok = yes
-         read only = yes              
+    - name: Ansible blockinfile insertafter and insertbefore
+      blockinfile:
+        dest: /home/mdtutorials2/block_output.txt
+        block: |
+          [Media]
+          comment=My media
+          path = /media
+          browsable = yes
+          guest ok = yes
+          read only = yes              
       
     - name: reload Samba
       service:
