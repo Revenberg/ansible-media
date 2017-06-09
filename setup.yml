@@ -203,13 +203,14 @@
 
     - name: Samba 1
       lineinfile:
+        dest: /etc/samba/smb.conf
         line: 'wins support = yes'
       become_user: root
       become: yes
       
     - name: Ansible blockinfile insertafter and insertbefore
       blockinfile:
-        dest: /home/mdtutorials2/block_output.txt
+        dest: /etc/samba/smb.conf
         block: |
           [Media]
           comment=My media
